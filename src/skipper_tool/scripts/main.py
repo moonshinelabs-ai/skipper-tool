@@ -3,6 +3,7 @@ import argparse
 import io
 import json
 import os
+import sys
 import time
 import uuid
 from datetime import datetime
@@ -161,6 +162,76 @@ class SkipperTool:
             )
         return self.llm_client
 
+    def _find_page_by_name(self, browser, page_name):
+        """Find a page by its window.name token.
+
+        Args:
+            browser: Playwright browser instance
+            page_name: The window.name token to search for
+
+        Returns:
+            Page object if found, None otherwise
+        """
+        logger.debug(f"Searching for page with window.name: {page_name}")
+
+        for ctx in browser.contexts:
+            for page in ctx.pages:
+                try:
+                    name = page.evaluate("window.name")
+                    logger.debug(f"Found page with window.name: {name}")
+                    if name == page_name:
+                        logger.debug(f"Found matching page: {page_name}")
+                        return page
+                except Exception as e:
+                    # Some pages may be in a state where evaluate fails briefly
+                    logger.debug(f"Failed to evaluate window.name on page: {e}")
+                    pass
+
+        logger.debug(f"No page found with window.name: {page_name}")
+        return None
+
+    def _connect_to_browser_via_cdp(self, p):
+        """Connect to browser via CDP with error handling.
+
+        Args:
+            p: Playwright instance
+
+        Returns:
+            Tuple of (browser, page) objects
+
+        Raises:
+            SystemExit: If connection fails
+        """
+        try:
+            logger.debug(
+                f"Attempting to connect to CDP at: {self.config['browser']['cdp_url']}"
+            )
+            browser = p.chromium.connect_over_cdp(self.config["browser"]["cdp_url"])
+
+            page_name = self.config["browser"]["page_name"]
+            page = self._find_page_by_name(browser, page_name)
+
+            if page is None:
+                # Not found: create a new tab and tag it
+                logger.info(f"Page with name '{page_name}' not found, creating new tab")
+                ctx = browser.contexts[self.config["browser"]["context_index"]]
+                page = ctx.new_page()
+                page.evaluate(f"window.name = {page_name!r}")
+                logger.debug(f"Created new page and set window.name to: {page_name}")
+            else:
+                logger.debug(f"Found existing page with window.name: {page_name}")
+
+            logger.debug("Successfully connected to browser via CDP")
+            return browser, page
+        except Exception as e:
+            logger.error(f"Failed to connect to browser via CDP: {e}")
+            logger.error(
+                "Make sure Chrome/Chromium is running with remote debugging enabled"
+            )
+            logger.error(f"Expected CDP URL: {self.config['browser']['cdp_url']}")
+            logger.error("Exiting program due to CDP connection failure")
+            sys.exit(1)
+
     def _get_window_data_file(self, window_id):
         return Path(
             f"{self.config['temp']['window_data_dir']}/skipper_window_{window_id}.json"
@@ -187,10 +258,7 @@ class SkipperTool:
 
     def view_window(self, p):
         logger.debug("Viewing window")
-        browser = p.chromium.connect_over_cdp(self.config["browser"]["cdp_url"])
-        page = browser.contexts[self.config["browser"]["context_index"]].pages[
-            self.config["browser"]["page_index"]
-        ]
+        browser, page = self._connect_to_browser_via_cdp(p)
 
         title = page.title()
         url = page.url
@@ -226,19 +294,13 @@ class SkipperTool:
         logger.info(f"Screenshot analysis:\n{screenshot_analysis}")
 
     def navigate_window(self, p, url):
-        browser = p.chromium.connect_over_cdp(self.config["browser"]["cdp_url"])
-        page = browser.contexts[self.config["browser"]["context_index"]].pages[
-            self.config["browser"]["page_index"]
-        ]
+        browser, page = self._connect_to_browser_via_cdp(p)
         page.goto(url)
         return self.view_window(p)
 
     def execute_command(self, p, prompt, command_type, return_view=False):
         # Get existing browser context or create new one
-        browser = p.chromium.connect_over_cdp(self.config["browser"]["cdp_url"])
-        page = browser.contexts[self.config["browser"]["context_index"]].pages[
-            self.config["browser"]["page_index"]
-        ]
+        browser, page = self._connect_to_browser_via_cdp(p)
 
         if command_type == "type":
             process_typing(page, prompt)

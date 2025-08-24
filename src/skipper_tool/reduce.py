@@ -10,6 +10,37 @@ from loguru import logger
 from skipper_tool.profiling import log_model_io, profile
 
 
+def resize_image_to_max_side(image, max_side=1400):
+    """Resize image so that the maximum side is max_side pixels while maintaining aspect ratio.
+
+    Args:
+        image: PIL Image object
+        max_side: Maximum size for the longer side (default: 1024)
+
+    Returns:
+        PIL Image object with resized dimensions
+    """
+    width, height = image.size
+
+    # If both dimensions are already smaller than max_side, return the original image
+    if width <= max_side and height <= max_side:
+        return image
+
+    # Calculate the scaling factor
+    if width > height:
+        # Width is the longer side
+        scale_factor = max_side / width
+    else:
+        # Height is the longer side
+        scale_factor = max_side / height
+
+    # Calculate new dimensions
+    new_width = int(width * scale_factor)
+    new_height = int(height * scale_factor)
+
+    return image.resize((new_width, new_height))
+
+
 def remove_base64_from_html(html_content):
     """Remove long base64 strings from HTML content to reduce token usage."""
     # Pattern to match data URLs with base64 content
@@ -98,8 +129,8 @@ def reduce_screenshot_with_llm(
     try:
         screenshot_bytes_io = io.BytesIO()
 
-        # Shrink the image by 50%
-        image = image.resize((image.width // 2, image.height // 2))
+        # Resize image so max side is 1024px while maintaining aspect ratio
+        image = resize_image_to_max_side(image)
         image.save(screenshot_bytes_io, format="PNG")
 
         # Convert PIL image to bytes
@@ -211,8 +242,8 @@ def determine_ui_click_element(client, image, action, model="gemini-2.5-flash"):
     try:
         screenshot_bytes_io = io.BytesIO()
 
-        # Shrink the image by 50%
-        image = image.resize((image.width // 2, image.height // 2))
+        # Resize image so max side is 1024px while maintaining aspect ratio
+        image = resize_image_to_max_side(image)
         image.save(screenshot_bytes_io, format="PNG")
 
         # Convert PIL image to bytes
