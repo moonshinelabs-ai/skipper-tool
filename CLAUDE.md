@@ -1,0 +1,2 @@
+- You may write or read markdown docs for the code you've written, but all of that markdown must go in autodoc/. Do not write or read markdown docs in the root directory.
+- If you need to test code, use `uv run python`/`uv run pytest` instead of `python`/`pytest` to run the code.

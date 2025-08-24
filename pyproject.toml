@@ -1,0 +1,60 @@
+[project]
+name = "skipper-tool"
+version = "0.2.10"
+description = "A desktop interaction tool that allows AI agents like Claude Code or OpenAI Codex to control web browsers and interact with desktop applications through natural language commands."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "playwright",
+    "openai",
+    "ruff",
+    "beautifulsoup4",
+    "pillow",
+    "loguru",
+    "rich",
+    "pytest",
+    "tomli",
+    "requests",
+    "setuptools",
+]
+
+[project.optional-dependencies]
+# Installs OmniParser-related local inference dependencies
+local = [
+    "torch",
+    "torchvision",
+    "supervision",
+    "ultralytics",
+    "transformers",
+    "opencv-python-headless",
+]
+
+omniparser = [
+    "paddleocr==3.2.0",
+    "paddlepaddle-gpu",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.11,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = "src"
+
+[[tool.uv.index]]
+name = "paddlepaddle-cu129"
+url = "https://www.paddlepaddle.org.cn/packages/stable/cu129"
+explicit = true
+
+[tool.uv.sources]
+paddlepaddle-gpu = [
+  { index = "paddlepaddle-cu129", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[project.scripts]
+skipper = "skipper_tool.scripts.main:main"
+
+[project.urls]
+Homepage = "https://github.com/moonshinelabs-ai/skipper-tool"
+Issues = "https://github.com/moonshinelabs-ai/skipper-tool/issues"
