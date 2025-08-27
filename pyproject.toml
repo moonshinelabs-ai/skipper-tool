@@ -1,6 +1,6 @@
 [project]
 name = "skipper-tool"
-version = "0.2.12"
+version = "0.2.13"
 description = "A desktop interaction tool that allows AI agents like Claude Code or OpenAI Codex to control web browsers and interact with desktop applications through natural language commands."
 readme = "README.md"
 requires-python = ">=3.10"

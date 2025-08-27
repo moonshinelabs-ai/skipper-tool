@@ -41,6 +41,7 @@ DEFAULT_CONFIG = {
         "cdp_url": "http://localhost:9222",
         "context_index": 0,
         "page_index": 0,
+        "page_name": "skipper_tool_993",
     },
     "screenshot": {
         "padding_pixels": 50,

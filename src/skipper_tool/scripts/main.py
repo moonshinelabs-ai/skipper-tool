@@ -224,6 +224,9 @@ class SkipperTool:
             logger.debug("Successfully connected to browser via CDP")
             return browser, page
         except Exception as e:
+            import traceback
+
+            traceback.print_exc()
             logger.error(f"Failed to connect to browser via CDP: {e}")
             logger.error(
                 "Make sure Chrome/Chromium is running with remote debugging enabled"

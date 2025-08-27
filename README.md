@@ -38,7 +38,9 @@ pip install 'skipper-tool[local]'
 
 ### Setup Chrome Remote Debugging
 
-1. Start Chrome with remote debugging enabled:
+Currently, `skipper` uses Chrome DevTools Protocol (CDP) to interact with the browser. Support is planned for other browsers, or just using the desktop app directly. However, for now we recommend using Chromium-based browsers like Chrome, Chromium, Edge, Brave, etc.
+
+1. Start a compatible browser with remote debugging enabled:
 ```bash
 # macOS
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
@@ -50,7 +52,7 @@ google-chrome --remote-debugging-port=9222
 "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222
 ```
 
-2. Keep Chrome running in the background while using skipper_tool.
+2. Keep the browser running in the background while using skipper_tool. You will need to provide a Gemini API key, as well as a Skipper API key if you intend to use the hosted version of OmniParser. If you instead want to run OmniParser locally, you can leave the Skipper API key blank.
 
 ### Setup Initial Configuration
 
@@ -60,6 +62,8 @@ skipper init --config
 
 # This will prompt for your Gemini and Skipper API keys and create ~/.skipperrc
 ```
+
+To use OmniParser locally, modify the `~/.skipperrc` file to point to your local OmniParser model. Download the model file from [here](https://huggingface.co/microsoft/OmniParser-v2.0/blob/main/icon_detect/model.pt).
 
 ## Usage
 
