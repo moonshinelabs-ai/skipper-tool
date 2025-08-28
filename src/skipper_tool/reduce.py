@@ -147,6 +147,7 @@ def reduce_screenshot_with_llm(
         - It should, however, include all the relevant text.
         - If the page has multiple modal elements, such as a foreground element that renders the background occluded, you can just create the html for the foreground element and describe the background element in english (but don't need to include all text).
         - The page title is {title} and the page url is {url}.
+        - If a text input is selected, include that information in the html as metadata.
         """)
 
         # Use the OpenAI client with vision capabilities and profiling
