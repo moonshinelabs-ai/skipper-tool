@@ -65,6 +65,10 @@ skipper init --config
 
 To use OmniParser locally, modify the `~/.skipperrc` file to point to your local OmniParser model. Download the model file from [here](https://huggingface.co/microsoft/OmniParser-v2.0/blob/main/icon_detect/model.pt).
 
+## Integration with Claude Code
+
+Skipper is designed to work seamlessly with Claude Code and other AI agents. To integrate it, simply usage information to your agent's configuration, such as `CLAUDE.md` or `AGENT.md`. For an example `AGENT.md` file, see [EXAMPLE.AGENT.md](EXAMPLE.AGENT.md).
+
 ## Usage
 
 Skipper provides three main commands for AI agents:
@@ -98,10 +102,6 @@ Execute actions on the current page:
 - **Click**: `skipper command --command_type click --prompt "Click the login button"`
 - **Type**: `skipper command --command_type type --prompt "Enter username: john.doe<Enter>"`
 - **Scroll**: `skipper command --command_type scroll --prompt "Scroll down"`
-
-## Integration with Claude Code
-
-Skipper is designed to work seamlessly with Claude Code and other AI agents. To integrate it, simply usage information to your agent's configuration, such as `CLAUDE.md` or `AGENT.md`. For an example `AGENT.md` file, see [EXAMPLE.AGENT.md](EXAMPLE.AGENT.md).
 
 ## Advanced Features
 
